@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { style, themas } from './style';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
-import api from '../../services/api';
 
 export default function Login({ navigation }: any) {
 
@@ -29,15 +28,15 @@ export default function Login({ navigation }: any) {
 
     setLoading(true);
 
-    try {
-      const response = await api.post('/auth/login', { username, password });
-      login({ username, token: response.data.token });
-      navigation.navigate('Home');
-    } catch (error) {
-      setErro('Usuário ou senha incorretos');
-    } finally {
+    setTimeout(() => {
+      if (username === 'admin@gmail.com' && password === 'copa123') {
+        login({ username, token: 'token-fake' });
+        navigation.navigate('Home');
+      } else {
+        setErro('Usuário ou senha incorretos');
+      }
       setLoading(false);
-    }
+    }, 1000);
   }
 
   return (
