@@ -1,79 +1,56 @@
-import React, { useEffect, useState } from 'react';
-import { 
-  StyleSheet, 
-  Text, 
-  View, 
-  FlatList, 
-  TouchableOpacity, 
-  ActivityIndicator, 
-  SafeAreaView 
+import React, { useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  TouchableOpacity,
+  SafeAreaView
 } from 'react-native';
-
-
-import api from '../../services/api'; 
 
 interface Produto {
   id: string;
   nome: string;
   preco: number;
-  descricao?: string;
 }
 
 export default function Produtos({ navigation }: any) {
-  const [produtos, setProdutos] = useState<Produto[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    api.get('/produtos')
-      .then((response) => {
-        setProdutos(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Erro ao buscar produtos na API:", error);
-        setLoading(false);
-      });
-  }, []);
+  const [produtos, setProdutos] = useState<Produto[]>([
+    { id: '1', nome: 'Camisa Brasil', preco: 299.9 },
+    { id: '2', nome: 'Bola Oficial', preco: 199.9 },
+    { id: '3', nome: 'Chuteira Pro', preco: 459.9 },
+  ]);
 
   const renderItem = ({ item }: { item: Produto }) => (
     <View style={styles.card}>
       <View style={styles.infoContainer}>
-        <Text style={styles.nomeProduto}>{item.nome}</Text>
-        <Text style={styles.precoProduto}>
-          R$ {typeof item.preco === 'number' ? item.preco.toFixed(2) : item.preco}
-        </Text>
+        <Text style={styles.nome}>{item.nome}</Text>
+        <Text style={styles.preco}>R$ {item.preco.toFixed(2)}</Text>
       </View>
-      
-      <TouchableOpacity 
-        style={styles.botaoEditar}
-        onPress={() => navigation.navigate('EditarProduto', { id: item.id })}
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() =>
+          navigation.navigate('EditarProduto', {
+            produto: item,
+            setProdutos
+          })
+        }
       >
-        <Text style={styles.textoBotao}>Editar</Text>
+        <Text style={styles.buttonText}>Editar</Text>
       </TouchableOpacity>
     </View>
   );
 
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#3498db" />
-        <Text style={styles.textoLoading}>Carregando produtos...</Text>
-      </View>
-    );
-  }
-
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.titulo}>Lista de Produtos</Text>
-      
+      <Text style={styles.title}>Lista de Produtos</Text>
+
       <FlatList
         data={produtos}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        contentContainerStyle={styles.lista}
-        ListEmptyComponent={
-          <Text style={styles.empty}>Nenhum produto cadastrado ainda.</Text>
-        }
+        contentContainerStyle={styles.list}
       />
     </SafeAreaView>
   );
@@ -81,28 +58,41 @@ export default function Produtos({ navigation }: any) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  textoLoading: { marginTop: 10, color: '#666' },
-  titulo: { fontSize: 24, fontWeight: 'bold', marginVertical: 20, textAlign: 'center', color: '#333' },
-  lista: { paddingHorizontal: 16, paddingBottom: 20 },
+  title: { fontSize: 22, fontWeight: 'bold', textAlign: 'center', margin: 20 },
+  list: { paddingHorizontal: 16 },
+
   card: {
     backgroundColor: '#fff',
-    padding: 16,
-    marginVertical: 8,
-    borderRadius: 8,
+    padding: 15,
+    marginBottom: 10,
+    borderRadius: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
+    alignItems: 'center'
   },
-  infoContainer: { flex: 1 },
-  nomeProduto: { fontSize: 18, fontWeight: 'bold', color: '#333' },
-  precoProduto: { fontSize: 16, color: '#2ecc71', fontWeight: '600', marginTop: 4 },
-  botaoEditar: { backgroundColor: '#3498db', paddingVertical: 8, paddingHorizontal: 16, borderRadius: 6 },
-  textoBotao: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
-  empty: { textAlign: 'center', marginTop: 40, color: '#999', fontSize: 16 }
+
+  infoContainer: {
+    flex: 1
+  },
+
+  nome: {
+    fontSize: 16,
+    fontWeight: 'bold'
+  },
+
+  preco: {
+    marginTop: 5,
+    color: 'green'
+  },
+
+  button: {
+    backgroundColor: '#009C3B',
+    padding: 10,
+    borderRadius: 8
+  },
+
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold'
+  }
 });
