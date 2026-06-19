@@ -1,84 +1,53 @@
-import React, { useEffect, useState } from 'react';
-import { 
-  StyleSheet, 
-  Text, 
-  View, 
-  FlatList, 
-  TouchableOpacity, 
-  ActivityIndicator, 
-  SafeAreaView 
-} from 'react-native';
-
-
-import api from '../../services/api'; 
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, SafeAreaView } from 'react-native';
 
 interface Produto {
   id: string;
   nome: string;
   preco: number;
-  descricao?: string;
 }
 
 export default function Produtos({ navigation }: any) {
-  const [produtos, setProdutos] = useState<Produto[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    api.get('/produtos')
-      .then((response) => {
-        setProdutos(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Erro ao buscar produtos na API:", error);
-        setLoading(false);
-      });
-  }, []);
+  const [produtos, setProdutos] = useState<Produto[]>([
+    { id: '1', nome: 'Camisa Brasil', preco: 299.9 },
+    { id: '2', nome: 'Bola Oficial', preco: 199.9 },
+    { id: '3', nome: 'Chuteira Profissional', preco: 459.9 },
+  ]);
 
   const renderItem = ({ item }: { item: Produto }) => (
     <View style={styles.card}>
       <View style={styles.infoContainer}>
         <Text style={styles.nomeProduto}>{item.nome}</Text>
-        <Text style={styles.precoProduto}>
-          R$ {typeof item.preco === 'number' ? item.preco.toFixed(2) : item.preco}
-        </Text>
+        <Text style={styles.precoProduto}>R$ {item.preco.toFixed(2)}</Text>
       </View>
-      
-      <TouchableOpacity 
+
+      <TouchableOpacity
         style={styles.botaoEditar}
-        onPress={() => navigation.navigate('EditarProduto', { id: item.id })}
+        onPress={() =>
+          navigation.navigate('EditarProduto', { produto: item, setProdutos })
+        }
       >
         <Text style={styles.textoBotao}>Editar</Text>
       </TouchableOpacity>
     </View>
   );
 
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#3498db" />
-        <Text style={styles.textoLoading}>Carregando produtos...</Text>
-      </View>
-    );
-  }
-
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.titulo}>Lista de Produtos</Text>
-      
+
       <FlatList
         data={produtos}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.lista}
         ListEmptyComponent={
-          <Text style={styles.empty}>Nenhum produto cadastrado ainda.</Text>
+          <Text style={styles.empty}>Nenhum produto cadastrado.</Text>
         }
       />
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
