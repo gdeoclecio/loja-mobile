@@ -5,7 +5,7 @@ import {
   View,
   FlatList,
   TouchableOpacity,
-  SafeAreaView
+  SafeAreaView,
 } from 'react-native';
 
 interface Produto {
@@ -18,7 +18,7 @@ export default function Produtos({ navigation }: any) {
   const [produtos, setProdutos] = useState<Produto[]>([
     { id: '1', nome: 'Camisa Brasil', preco: 299.9 },
     { id: '2', nome: 'Bola Oficial', preco: 199.9 },
-    { id: '3', nome: 'Chuteira Pro', preco: 459.9 },
+    { id: '3', nome: 'Chuteira Profissional', preco: 459.9 },
   ]);
 
   const renderItem = ({ item }: { item: Produto }) => (
@@ -33,7 +33,7 @@ export default function Produtos({ navigation }: any) {
         onPress={() =>
           navigation.navigate('EditarProduto', {
             produto: item,
-            setProdutos
+            setProdutos,
           })
         }
       >
@@ -51,15 +51,30 @@ export default function Produtos({ navigation }: any) {
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
+        ListEmptyComponent={
+          <Text style={styles.empty}>Nenhum produto cadastrado.</Text>
+        }
       />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
-  title: { fontSize: 22, fontWeight: 'bold', textAlign: 'center', margin: 20 },
-  list: { paddingHorizontal: 16 },
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    margin: 20,
+  },
+
+  list: {
+    paddingHorizontal: 16,
+  },
 
   card: {
     backgroundColor: '#fff',
@@ -68,31 +83,37 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center'
+    alignItems: 'center',
   },
 
   infoContainer: {
-    flex: 1
+    flex: 1,
   },
 
   nome: {
     fontSize: 16,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
 
   preco: {
     marginTop: 5,
-    color: 'green'
+    color: 'green',
   },
 
   button: {
     backgroundColor: '#009C3B',
     padding: 10,
-    borderRadius: 8
+    borderRadius: 8,
   },
 
   buttonText: {
     color: '#fff',
-    fontWeight: 'bold'
-  }
+    fontWeight: 'bold',
+  },
+
+  empty: {
+    textAlign: 'center',
+    marginTop: 40,
+    color: '#999',
+  },
 });
