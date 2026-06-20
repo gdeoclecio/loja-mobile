@@ -3,10 +3,12 @@ import React, { useState } from 'react';
 import { style, themas } from './style';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
+import api from '../../services/api';
+
 
 export default function Login({ navigation }: any) {
 
-  const { login } = useAuth();
+  const { login,darkMode, toggleDarkMode } = useAuth();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -28,25 +30,35 @@ export default function Login({ navigation }: any) {
 
     setLoading(true);
 
-    setTimeout(() => {
-      if (username === 'admin@gmail.com' && password === 'copa123') {
-        login({ username, token: 'token-fake' });
-        navigation.navigate('Home');
-      } else {
-        setErro('Usuário ou senha incorretos');
-      }
+    try {
+      const response = await api.post('/auth/login', { username, password });
+      login({ username, token: response.data.token });
+      navigation.navigate('Home');
+    } catch (error) {
+      setErro('Usuário ou senha incorretos');
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   }
 
   return (
-    <View style={style.container}>
+    <View style={[style.container,{backgroundColor:darkMode ? '#1a1a1a' : '#F5F5F5'}]}>
 
       <View style={style.boxTop}>
         <Image
           source={require('../../../assets/bandeirabrasil.png')}
           style={{ width: 180, height: 180, resizeMode: 'contain' }}
+          
         />
+        <Pressable onPress={toggleDarkMode} style={{ position: 'absolute', top: 20, right: 20 }}>  
+       <MaterialIcons
+         name={darkMode ? 'wb-sunny' : 'nightlight-round'}
+          size={28}
+          color={darkMode ? '#FFD700' : '#002776'}
+  /> 
+</Pressable>
+
+
       </View>
 
       <View style={style.boxMid}>

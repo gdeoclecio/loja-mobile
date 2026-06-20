@@ -1,8 +1,14 @@
 
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { useAuth } from "../../contexts/AuthContext"; // preciso para acessar a função logaut
+
 
 export default function Home({ navigation }: any) {
+
+  const {logout} = useAuth();  // para acessar o que esta na classe AuthContext
+
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>🏠 Home Temporária</Text>
@@ -20,7 +26,9 @@ export default function Home({ navigation }: any) {
 
       <TouchableOpacity
         style={[styles.button, { backgroundColor: "#e74c3c" }]}
-        onPress={() => navigation.navigate("Login")}
+        onPress={async () =>{ await logout(); // await chama a funcao que limpa os dados da memoria
+          navigation.navigate("Login")
+        }}
       >
         <Text style={styles.buttonText}>Sair</Text>
       </TouchableOpacity>
