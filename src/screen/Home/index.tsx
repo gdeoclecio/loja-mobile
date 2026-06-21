@@ -1,19 +1,42 @@
-
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Pressable,
+} from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useAuth } from "../../contexts/AuthContext"; // preciso para acessar a função logaut
 
-
 export default function Home({ navigation }: any) {
-
-  const {logout} = useAuth();  // para acessar o que esta na classe AuthContext
-
+  const { logout, darkMode, toggleDarkMode } = useAuth(); // para acessar o que esta na classe AuthContext
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>🏠 Home Temporária</Text>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: darkMode ? "#1a1a1a" : "#f5f5f5" },
+      ]}
+    >
+      <Pressable
+        onPress={toggleDarkMode}
+        style={{ position: "absolute", top: 20, right: 20 }}
+      >
+        <MaterialIcons
+          name={darkMode ? "wb-sunny" : "nightlight-round"}
+          size={28}
+          color={darkMode ? "#FFD700" : "#002776"}
+        />
+      </Pressable>
 
-      <Text style={styles.subtitle}>
+      <Text style={[styles.title, { color: darkMode ? "#FFFFFF" : "#000000" }]}>
+        🏠 Home Temporária
+      </Text>
+
+      <Text
+        style={[styles.subtitle, { color: darkMode ? "#AAAAAA" : "#666666" }]}
+      >
         App em desenvolvimento - modo teste
       </Text>
 
@@ -26,8 +49,9 @@ export default function Home({ navigation }: any) {
 
       <TouchableOpacity
         style={[styles.button, { backgroundColor: "#e74c3c" }]}
-        onPress={async () =>{ await logout(); // await chama a funcao que limpa os dados da memoria
-          navigation.navigate("Login")
+        onPress={async () => {
+          await logout(); // await chama a funcao que limpa os dados da memoria
+          navigation.navigate("Login");
         }}
       >
         <Text style={styles.buttonText}>Sair</Text>
@@ -68,5 +92,3 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
-
-
