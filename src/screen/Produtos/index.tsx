@@ -10,8 +10,9 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
-import api from '../../services/api'; 
-import { themas } from '../Login/themas'; 
+import api from '../../services/api';
+import { themas } from '../Login/themas';
+
 interface Produto {
   id: string;
   nome: string;
@@ -41,7 +42,7 @@ export default function Produtos({ navigation }: any) {
     carregarProdutos();
   }, []);
 
-  
+
   const produtosFiltrados = produtos.filter(produto =>
     produto.nome.toLowerCase().includes(pesquisa.toLowerCase())
   );
@@ -91,7 +92,7 @@ export default function Produtos({ navigation }: any) {
           <Text style={{ marginTop: 10, color: '#555' }}>Buscando produtos...</Text>
         </View>
       ) : (
-        
+       
         <FlatList
           data={produtosFiltrados}
           keyExtractor={(item) => item.id.toString()}
