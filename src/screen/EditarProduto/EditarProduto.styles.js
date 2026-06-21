@@ -92,6 +92,30 @@ const styles = StyleSheet.create({
   botaoDesabilitado: {
     opacity: 0.6,
   },
+
+  botaoExcluir: {
+  marginTop: 16,
+  padding: 14,
+  backgroundColor: "#cc0000",
+  borderRadius: 8,
+  alignItems: "center",
+},
+
+botaoExcluirTexto: {
+  color: "#fff",
+  fontSize: 16,
+  fontWeight: "bold",
+},
+
+botaoDesabilitado: {
+  opacity: 0.6,
+},
+
+loadingText: {
+  marginTop: 10,
+  fontSize: 16,
+  color: "#333",
+},
 });
 
 export default styles;

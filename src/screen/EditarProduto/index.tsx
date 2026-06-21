@@ -122,10 +122,57 @@ export default function EditarProduto() {
     }
   }
 
+  function handleDeleteConfirm() {
+    Alert.alert(
+      "Excluir Produto",
+      "Tem certeza que deseja excluir este produto? Essa ação não poderá ser desfeita.",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              setSaving(true);
+
+              await api.delete(`/products/${id}`);
+
+              Alert.alert(
+                "Sucesso",
+                "Produto excluído com sucesso!",
+                [
+                  {
+                    text: "OK",
+                    onPress: () =>
+                      navigation.navigate("Home"),
+                  },
+                ]
+              );
+            } catch (error) {
+              const mensagem =
+                error.response?.data?.message ||
+                "Erro ao excluir produto.";
+
+              Alert.alert("Erro", mensagem);
+            } finally {
+              setSaving(false);
+            }
+          },
+        },
+      ]
+    );
+  }
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#009c3b" />
+        <ActivityIndicator
+          size="large"
+          color="#009c3b"
+        />
         <Text style={styles.loadingText}>
           Carregando produto...
         </Text>
@@ -196,6 +243,20 @@ export default function EditarProduto() {
             </Text>
           </TouchableOpacity>
         </View>
+
+        <TouchableOpacity
+          style={[
+            styles.botaoExcluir,
+            saving &&
+              styles.botaoDesabilitado,
+          ]}
+          onPress={handleDeleteConfirm}
+          disabled={saving}
+        >
+          <Text style={styles.botaoExcluirTexto}>
+            Excluir Produto
+          </Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
