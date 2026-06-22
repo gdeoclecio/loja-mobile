@@ -9,30 +9,32 @@ import {
   ActivityIndicator,
   TextInput,
   Alert,
+  Image,
 } from 'react-native';
+
 import api from '../../services/api';
 import { themas } from '../Login/themas';
 
 interface Produto {
-  id: string;
-  nome: string;
-  preco: number;
+  id: number;
+  title: string;
+  price: number;
+  image: string;
 }
 
-export default function Produtos({ navigation }: any) {
-  const [produtos, setProdutos] = useState<Produto[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [pesquisa, setPesquisa] = useState<string>('');
+export default function Produtos() {
 
-  
+  const [produtos, setProdutos] = useState<Produto[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [pesquisa, setPesquisa] = useState('');
+
+  // 📌 LISTAR PRODUTOS
   const carregarProdutos = async () => {
     try {
-      setLoading(true);
-      const response = await api.get('/produtos');
+      const response = await api.get('/products');
       setProdutos(response.data);
     } catch (error) {
-      console.error("Erro ao buscar produtos da API:", error);
-      Alert.alert("Erro", "Não foi possível carregar a lista de produtos.");
+      Alert.alert('Erro', 'Não foi possível carregar produtos');
     } finally {
       setLoading(false);
     }
@@ -42,166 +44,129 @@ export default function Produtos({ navigation }: any) {
     carregarProdutos();
   }, []);
 
+  // 🗑 DELETE PRODUTO
+  async function deletarProduto(id: number) {
+    try {
+      await api.delete(`/products/${id}`);
 
-  const produtosFiltrados = produtos.filter(produto =>
-    produto.nome.toLowerCase().includes(pesquisa.toLowerCase())
+      // atualiza lista depois de deletar
+      setProdutos(prev => prev.filter(item => item.id !== id));
+
+    } catch (error) {
+      Alert.alert('Erro', 'Erro ao deletar produto');
+    }
+  }
+
+  // 🔎 FILTRO
+  const produtosFiltrados = produtos.filter(p =>
+    p.title.toLowerCase().includes(pesquisa.toLowerCase())
   );
 
-  const { darkMode, toggleDarkMode } = useAuth();
-
+  // 📦 ITEM DA LISTA
   const renderItem = ({ item }: { item: Produto }) => (
-    <View
-      style={[styles.card, { backgroundColor: darkMode ? "#2a2a2a" : "#fff" }]}
-    >
-      <View style={styles.infoContainer}>
-        <Text style={[styles.nome, { color: darkMode ? '#FFFFFF' : '#000000' }]}>{item.nome}</Text>
-        <Text style={styles.preco}>R$ {item.preco.toFixed(2)}</Text>
+    <View style={styles.card}>
+
+      <Image source={{ uri: item.image }} style={styles.image} />
+
+      <View style={styles.info}>
+        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.price}>
+          R$ {Number(item.price).toFixed(2)}
+        </Text>
       </View>
 
+      {/* 🗑 DELETE */}
       <TouchableOpacity
-        style={styles.button}
-        onPress={() =>
-          navigation.navigate("EditarProduto", {
-            produto: item,
-            setProdutos,
-          })
-        }
+        style={styles.deleteButton}
+        onPress={() => deletarProduto(item.id)}
       >
-        <Text style={styles.buttonText}>Editar</Text>
+        <Text style={{ color: '#fff', fontWeight: 'bold' }}>
+          Excluir
+        </Text>
       </TouchableOpacity>
+
     </View>
   );
 
   return (
-    <SafeAreaView
-      style={[
-        styles.container,
-        { backgroundColor: darkMode ? "#1a1a1a" : "#f5f5f5" },
-      ]}
-    >
-      <Text style={[styles.title, { color: darkMode ? "#FFFFFF" : "#000000" }]}>
-        Lista de Produtos
-      </Text>
+    <SafeAreaView style={styles.container}>
 
-      <Pressable
-        onPress={toggleDarkMode}
-        style={{ position: 'absolute', top: 20, right: 20 }}
-      >
-        <MaterialIcons
-          name={darkMode ? 'wb-sunny' : 'nightlight-round'}
-          size={28}
-          color={darkMode ? '#FFD700' : '#002776'}
-        />
-      </Pressable>
+      <Text style={styles.header}>Produtos</Text>
 
-      
-      <View style={styles.searchSection}>
-        <View style={styles.BoxInput}>
-          <TextInput
-            style={styles.input}
-            placeholder="Buscar produto por nome..."
-            placeholderTextColor={themas.colors.gray || '#888'}
-            value={pesquisa}
-            onChangeText={(text) => setPesquisa(text)}
-          />
-        </View>
-      </View>
+      <TextInput
+        style={styles.search}
+        placeholder="Buscar produto..."
+        value={pesquisa}
+        onChangeText={setPesquisa}
+      />
 
-     
       {loading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={themas.colors.primary || '#009C3B'} />
-          <Text style={{ marginTop: 10, color: '#555' }}>Buscando produtos...</Text>
-        </View>
+        <ActivityIndicator size="large" color="#009C3B" />
       ) : (
-       
         <FlatList
           data={produtosFiltrados}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
-          contentContainerStyle={styles.list}
-          ListEmptyComponent={
-            <Text style={styles.empty}>
-              {pesquisa ? "Nenhum produto corresponde à busca." : "Nenhum produto cadastrado."}
-            </Text>
-          }
         />
       )}
+
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    padding: 20,
+    backgroundColor: '#f5f5f5',
   },
-  title: {
+
+  header: {
     fontSize: 22,
     fontWeight: 'bold',
-    textAlign: 'center',
-    marginVertical: 15,
+    marginBottom: 10,
   },
-  searchSection: {
-    paddingHorizontal: 16,
-    marginBottom: 15,
-  },
-  BoxInput: {
-    width: '100%',
-    height: 45,
+
+  search: {
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 40,
-    flexDirection: "row",
-    alignItems: 'center',
-    paddingHorizontal: 15,
-    backgroundColor: '#fff',
-  },
-  input: {
-    flex: 1,
-    color: 'black',
-    paddingLeft: 5,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  list: {
-    paddingHorizontal: 16,
-  },
-  card: {
-    backgroundColor: "#fff",
-    padding: 15,
-    marginBottom: 10,
-    borderRadius: 10,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  infoContainer: {
-    flex: 1,
-  },
-  nome: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  preco: {
-    marginTop: 5,
-    color: "green",
-  },
-  button: {
-    backgroundColor: "#009C3B",
     padding: 10,
     borderRadius: 8,
+    marginBottom: 10,
   },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
+
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 10,
   },
-  empty: {
-    textAlign: "center",
-    marginTop: 40,
-    color: "#999",
+
+  image: {
+    width: 60,
+    height: 60,
+    marginRight: 10,
+    borderRadius: 6,
+  },
+
+  info: {
+    flex: 1,
+  },
+
+  title: {
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+
+  price: {
+    color: 'green',
+    marginTop: 4,
+  },
+
+  deleteButton: {
+    backgroundColor: 'red',
+    padding: 8,
+    borderRadius: 8,
   },
 });
