@@ -1,108 +1,172 @@
-import React, { useEffect, useState } from 'react';
-import { 
-  StyleSheet, 
-  Text, 
-  View, 
-  FlatList, 
-  TouchableOpacity, 
-  ActivityIndicator, 
-  SafeAreaView 
+import React, { useState, useEffect } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  TouchableOpacity,
+  SafeAreaView,
+  ActivityIndicator,
+  TextInput,
+  Alert,
+  Image,
 } from 'react-native';
 
-
-import api from '../../services/api'; 
+import api from '../../services/api';
+import { themas } from '../Login/themas';
 
 interface Produto {
-  id: string;
-  nome: string;
-  preco: number;
-  descricao?: string;
+  id: number;
+  title: string;
+  price: number;
+  image: string;
 }
 
-export default function Produtos({ navigation }: any) {
+export default function Produtos() {
+
   const [produtos, setProdutos] = useState<Produto[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
+  const [pesquisa, setPesquisa] = useState('');
+
+  // 📌 LISTAR PRODUTOS
+  const carregarProdutos = async () => {
+    try {
+      const response = await api.get('/products');
+      setProdutos(response.data);
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível carregar produtos');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    api.get('/produtos')
-      .then((response) => {
-        setProdutos(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Erro ao buscar produtos na API:", error);
-        setLoading(false);
-      });
+    carregarProdutos();
   }, []);
 
+  // 🗑 DELETE PRODUTO
+  async function deletarProduto(id: number) {
+    try {
+      await api.delete(`/products/${id}`);
+
+      // atualiza lista depois de deletar
+      setProdutos(prev => prev.filter(item => item.id !== id));
+
+    } catch (error) {
+      Alert.alert('Erro', 'Erro ao deletar produto');
+    }
+  }
+
+  // 🔎 FILTRO
+  const produtosFiltrados = produtos.filter(p =>
+    p.title.toLowerCase().includes(pesquisa.toLowerCase())
+  );
+
+  // 📦 ITEM DA LISTA
   const renderItem = ({ item }: { item: Produto }) => (
     <View style={styles.card}>
-      <View style={styles.infoContainer}>
-        <Text style={styles.nomeProduto}>{item.nome}</Text>
-        <Text style={styles.precoProduto}>
-          R$ {typeof item.preco === 'number' ? item.preco.toFixed(2) : item.preco}
+
+      <Image source={{ uri: item.image }} style={styles.image} />
+
+      <View style={styles.info}>
+        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.price}>
+          R$ {Number(item.price).toFixed(2)}
         </Text>
       </View>
-      
-      <TouchableOpacity 
-        style={styles.botaoEditar}
-        onPress={() => navigation.navigate('EditarProduto', { id: item.id })}
+
+      {/* 🗑 DELETE */}
+      <TouchableOpacity
+        style={styles.deleteButton}
+        onPress={() => deletarProduto(item.id)}
       >
-        <Text style={styles.textoBotao}>Editar</Text>
+        <Text style={{ color: '#fff', fontWeight: 'bold' }}>
+          Excluir
+        </Text>
       </TouchableOpacity>
+
     </View>
   );
 
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#3498db" />
-        <Text style={styles.textoLoading}>Carregando produtos...</Text>
-      </View>
-    );
-  }
-
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.titulo}>Lista de Produtos</Text>
-      
-      <FlatList
-        data={produtos}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderItem}
-        contentContainerStyle={styles.lista}
-        ListEmptyComponent={
-          <Text style={styles.empty}>Nenhum produto cadastrado ainda.</Text>
-        }
+
+      <Text style={styles.header}>Produtos</Text>
+
+      <TextInput
+        style={styles.search}
+        placeholder="Buscar produto..."
+        value={pesquisa}
+        onChangeText={setPesquisa}
       />
+
+      {loading ? (
+        <ActivityIndicator size="large" color="#009C3B" />
+      ) : (
+        <FlatList
+          data={produtosFiltrados}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderItem}
+        />
+      )}
+
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  textoLoading: { marginTop: 10, color: '#666' },
-  titulo: { fontSize: 24, fontWeight: 'bold', marginVertical: 20, textAlign: 'center', color: '#333' },
-  lista: { paddingHorizontal: 16, paddingBottom: 20 },
-  card: {
-    backgroundColor: '#fff',
-    padding: 16,
-    marginVertical: 8,
-    borderRadius: 8,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#f5f5f5',
   },
-  infoContainer: { flex: 1 },
-  nomeProduto: { fontSize: 18, fontWeight: 'bold', color: '#333' },
-  precoProduto: { fontSize: 16, color: '#2ecc71', fontWeight: '600', marginTop: 4 },
-  botaoEditar: { backgroundColor: '#3498db', paddingVertical: 8, paddingHorizontal: 16, borderRadius: 6 },
-  textoBotao: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
-  empty: { textAlign: 'center', marginTop: 40, color: '#999', fontSize: 16 }
+
+  header: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+
+  search: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 10,
+  },
+
+  image: {
+    width: 60,
+    height: 60,
+    marginRight: 10,
+    borderRadius: 6,
+  },
+
+  info: {
+    flex: 1,
+  },
+
+  title: {
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+
+  price: {
+    color: 'green',
+    marginTop: 4,
+  },
+
+  deleteButton: {
+    backgroundColor: 'red',
+    padding: 8,
+    borderRadius: 8,
+  },
 });

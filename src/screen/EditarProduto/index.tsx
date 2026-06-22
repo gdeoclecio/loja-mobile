@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from "react-native";
+import {View,Text,TextInput,TouchableOpacity,ScrollView,Alert,ActivityIndicator,Pressable,} from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
+import { MaterialIcons } from "@expo/vector-icons";
 import api from "../../services/api";
 import styles from "./EditarProduto.styles";
+import { useAuth } from "../../contexts/AuthContext";
 
-const INITIAL_FORM = { title: "", price: "", description: "", category: "", image: "" };
+const INITIAL_FORM = {
+  title: "",
+  price: "",
+  description: "",
+  category: "",
+  image: "",
+};
 
 const FIELDS = [
   { name: "title",       placeholder: "Nome do Produto"    },
@@ -14,66 +22,354 @@ const FIELDS = [
   { name: "image",       placeholder: "URL da imagem",     keyboardType: "url", autoCapitalize: "none" },
 ];
 
+
 export default function EditarProduto() {
-  const { params: { id } } = useRoute();
+  const {params: { id },} = useRoute<any>();
+
   const navigation = useNavigation();
 
+  const { darkMode, toggleDarkMode } = useAuth();
   const [formData, setFormData] = useState(INITIAL_FORM);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  const handleChange = (name, value) => setFormData((prev) => ({ ...prev, [name]: value }));
+  function handleChange(name, value) {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
 
   useEffect(() => {
-    api.get(`/products/${id}`)
-      .then(({ data }) => setFormData({ ...data, price: String(data.price) }))
-      .catch(() => Alert.alert("Erro", "Não foi possível carregar o produto."))
-      .finally(() => setLoading(false));
+    async function carregarProduto() {
+      try {
+        const { data } = await api.get(`/products/${id}`);
+
+        setFormData({
+          ...data,
+          price: String(data.price),
+        });
+      } catch (error) {
+        Alert.alert(
+          "Erro",
+          "Não foi possível carregar o produto."
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    carregarProduto();
   }, [id]);
 
   async function handleSubmit() {
-    if (!formData.title || !formData.description || !formData.category)
-      return Alert.alert("Atenção", "Preencha todos os campos");
+    if (
+      !formData.title.trim() ||
+      !formData.description.trim() ||
+      !formData.category.trim()
+    ) {
+      return Alert.alert(
+        "Atenção",
+        "Preencha todos os campos obrigatórios."
+      );
+    }
 
-    if (Number(formData.price) <= 0)
-      return Alert.alert("Atenção", "Preço deve ser maior que 0");
+    if (!formData.price.trim()) {
+      return Alert.alert(
+        "Atenção",
+        "Informe o preço do produto."
+      );
+    }
+
+    if (Number(formData.price) <= 0) {
+      return Alert.alert(
+        "Atenção",
+        "O preço deve ser maior que 0."
+      );
+    }
+
+    if (
+      formData.image &&
+      !formData.image.startsWith("http")
+    ) {
+      return Alert.alert(
+        "Atenção",
+        "Informe uma URL de imagem válida."
+      );
+    }
 
     try {
-      await api.put(`/products/${id}`, { ...formData, price: Number(formData.price) });
+      setSaving(true);
+
+      await api.put(`/products/${id}`, {
+        ...formData,
+        price: Number(formData.price),
+      });
+
+      Alert.alert(
+        "Sucesso",
+        "Produto atualizado com sucesso!"
+      );
+
       navigation.navigate("Produtos");
-    } catch {
-      Alert.alert("Erro", "Erro ao editar produto");
+    } catch (error) {
+      const mensagem =
+        error.response?.data?.message ||
+        "Erro ao editar produto.";
+
+      Alert.alert("Erro", mensagem);
+    } finally {
+      setSaving(false);
     }
   }
 
-  if (loading)
-    return <View style={styles.loadingContainer}><ActivityIndicator size="large" color="#009c3b" /></View>;
+  function handleDeleteConfirm() {
+    Alert.alert(
+      "Excluir Produto",
+      "Tem certeza que deseja excluir este produto? Essa ação não poderá ser desfeita.",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              setSaving(true);
 
+              await api.delete(`/products/${id}`);
+
+              Alert.alert(
+                "Sucesso",
+                "Produto excluído com sucesso!",
+                [
+                  {
+                    text: "OK",
+                    onPress: () =>
+                      navigation.navigate("Home"),
+                  },
+                ]
+              );
+            } catch (error) {
+              const mensagem =
+                error.response?.data?.message ||
+                "Erro ao excluir produto.";
+
+              Alert.alert("Erro", mensagem);
+            } finally {
+              setSaving(false);
+            }
+          },
+        },
+      ]
+    );
+  }
+
+  if (loading) {
   return (
-    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-      <View style={styles.card}>
-        <Text style={styles.titulo}>Editar Produto</Text>
+    <View
+      style={[
+        styles.loadingContainer,
+        {
+          backgroundColor: darkMode
+            ? "#1a1a1a"
+            : "#f5f5f5",
+        },
+      ]}
+    >
+      <ActivityIndicator
+        size="large"
+        color="#009c3b"
+      />
 
-        {FIELDS.map(({ name, placeholder, ...rest }) => (
-          <TextInput
-            key={name}
-            style={styles.input}
-            placeholder={placeholder}
-            placeholderTextColor="#aaa"
-            value={formData[name]}
-            onChangeText={(v) => handleChange(name, v)}
-            {...rest}
-          />
-        ))}
-
-        <View style={styles.acoes}>
-          <TouchableOpacity style={styles.botaoSalvar} onPress={handleSubmit}>
-            <Text style={styles.botaoSalvarTexto}>Editar</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.botaoCancelar} onPress={() => navigation.navigate("Produtos")}>
-            <Text style={styles.botaoCancelarTexto}>Cancelar</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </ScrollView>
+      <Text
+        style={[
+          styles.loadingText,
+          {
+            color: darkMode
+              ? "#fff"
+              : "#333",
+          },
+        ]}
+      >
+        Carregando produto...
+      </Text>
+    </View>
   );
 }
+
+return (
+  <ScrollView
+    contentContainerStyle={[
+      styles.container,
+      {
+        backgroundColor: darkMode
+          ? "#1a1a1a"
+          : "#f5f5f5",
+      },
+    ]}
+  >
+    <View
+      style={[
+        styles.card,
+        {
+          backgroundColor: darkMode
+            ? "#2b2b2b"
+            : "#fff",
+
+          borderColor: darkMode
+            ? "#444"
+            : "#e0e0e0",
+        },
+      ]}
+    >
+      <Pressable
+        onPress={toggleDarkMode}
+        style={{
+          position: "absolute",
+          top: 20,
+          right: 20,
+          zIndex: 1,
+        }}
+      >
+        <MaterialIcons
+          name={
+            darkMode
+              ? "wb-sunny"
+              : "nightlight-round"
+          }
+          size={28}
+          color={
+            darkMode
+              ? "#FFD700"
+              : "#002776"
+          }
+        />
+      </Pressable>
+
+      <Text
+        style={[
+          styles.titulo,
+          {
+            color: darkMode
+              ? "#fff"
+              : "#009c3b",
+          },
+        ]}
+      >
+        Editar Produto
+      </Text>
+
+      {FIELDS.map(
+        ({
+          name,
+          placeholder,
+          ...rest
+        }) => (
+          <TextInput
+            key={name}
+            style={[
+              styles.input,
+              {
+                backgroundColor:
+                  darkMode
+                    ? "#1f1f1f"
+                    : "#fff",
+
+                color: darkMode
+                  ? "#fff"
+                  : "#333",
+
+                borderColor:
+                  darkMode
+                    ? "#666"
+                    : "#009c3b",
+              },
+            ]}
+            placeholder={placeholder}
+            placeholderTextColor={
+              darkMode
+                ? "#888"
+                : "#aaa"
+            }
+            value={formData[name]}
+            onChangeText={(value) =>
+              handleChange(
+                name,
+                value
+              )
+            }
+            editable={!saving}
+            {...rest}
+          />
+        )
+      )}
+
+      <View style={styles.acoes}>
+        <TouchableOpacity
+          style={[
+            styles.botaoSalvar,
+            saving &&
+              styles.botaoDesabilitado,
+          ]}
+          onPress={handleSubmit}
+          disabled={saving}
+        >
+          {saving ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text
+              style={
+                styles.botaoSalvarTexto
+              }
+            >
+              Editar
+            </Text>
+          )}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.botaoCancelar,
+            saving &&
+              styles.botaoDesabilitado,
+          ]}
+          onPress={() =>
+            navigation.navigate(
+              "Produtos"
+            )
+          }
+          disabled={saving}
+        >
+          <Text
+            style={
+              styles.botaoCancelarTexto
+            }
+          >
+            Cancelar
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity
+        style={[
+          styles.botaoExcluir,
+          saving &&
+            styles.botaoDesabilitado,
+        ]}
+        onPress={handleDeleteConfirm}
+        disabled={saving}
+      >
+        <Text
+          style={
+            styles.botaoExcluirTexto
+          }
+        >
+          Excluir Produto
+        </Text>
+      </TouchableOpacity>
+    </View>
+  </ScrollView>
+);

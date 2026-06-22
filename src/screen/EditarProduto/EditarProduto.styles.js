@@ -1,11 +1,17 @@
 import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#f5f5f5",
+    gap: 10,
+  },
+
+  loadingText: {
+    fontSize: 16,
+    color: "#333",
   },
 
   container: {
@@ -17,13 +23,14 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#fff",
     padding: 24,
     borderRadius: 12,
     width: "100%",
     maxWidth: 480,
     borderWidth: 1,
     borderColor: "#e0e0e0",
+    elevation: 3,
   },
 
   titulo: {
@@ -61,7 +68,7 @@ const styles = StyleSheet.create({
   },
 
   botaoSalvarTexto: {
-    color: "#ffffff",
+    color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
   },
@@ -69,7 +76,7 @@ const styles = StyleSheet.create({
   botaoCancelar: {
     flex: 1,
     padding: 12,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#fff",
     borderRadius: 8,
     borderWidth: 2,
     borderColor: "#cc0000",
@@ -81,6 +88,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-});
 
-export default styles;
+  botaoExcluir: {
+    marginTop: 16,
+    padding: 14,
+    backgroundColor: "#cc0000",
+    borderRadius: 8,
+    alignItems: "center",
+  },
+
+  botaoExcluirTexto: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+
+  botaoDesabilitado: {
+    opacity: 0.6,
+  },
+});

@@ -5,14 +5,12 @@ import { themas } from "./themas";
 export { themas };
 
 export const style = StyleSheet.create({
-
-  container: {
-    flex: 1,
-    backgroundColor: themas.colors.bgScreen,
-    alignItems: "center",
-    justifyContent: "flex-start",
-
-  },
+container: {
+  flex: 1,
+  backgroundColor: themas.colors.bgScreen,
+  alignItems: "center",
+  justifyContent: "space-between",
+},
   boxTop: {
     height: Dimensions.get('window').height * 0.35,
     width: "100%",
@@ -26,13 +24,12 @@ export const style = StyleSheet.create({
     paddingHorizontal: 37,
     paddingVertical: 20,
   },
-  boxBottom: {
-    height: Dimensions.get('window').height/3,
-    width: "100%",
-    //backgroundColor: "#D4B8E0",
-    alignItems:"center",
-    justifyContent:"center",
-  },
+boxBottom: {
+  width: "100%",
+  paddingHorizontal: 37,
+  marginTop: 20,
+  alignItems: "center",
+},
 
   text:{
     fontWeight:'bold',
@@ -41,45 +38,56 @@ export const style = StyleSheet.create({
     color: themas.colors.secundary,
 
   },
-    titleInput:{
-        marginLeft:5,
-        color:themas.colors.gray,
-        marginTop:20,
+    titleInput: {
+  marginLeft: 5,
+  marginTop: 20,
+  marginBottom: 4,
+  color: themas.colors.secundary,
+  fontSize: 13,
+  fontWeight: '600',
+  letterSpacing: 0.5,
+},
 
 
-  },
-  BoxInput:{
-    width:'100%',
-    height:45,
-    borderWidth:1,
-    borderRadius:40,
-    marginTop:10,
-    flexDirection:"row",
-    alignItems:'center',
-    paddingHorizontal: 15,
-  },
+
+
+  BoxInput: {
+  width: '100%',
+  height: 50,
+  borderWidth: 1.5,
+  borderRadius: 12,
+  marginTop: 10,
+  flexDirection: 'row',
+  alignItems: 'center',
+  paddingHorizontal: 15,
+  borderColor: '#009C3B',
+  backgroundColor: '#fff',
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.08,
+  shadowRadius: 4,
+  elevation: 2,
+},
+
+ 
   input:{
     flex: 1,
     color:'black',
     paddingLeft:5,
   },
-  button:{
-    width:250,
-    height:50,
-    alignItems:"center",
-    justifyContent:"center",
-    backgroundColor: themas.colors.primary,
-    borderRadius:40,
-    shadowColor: "#000",
-shadowOffset: {
-	width: 0,
-	height: 12,
+  button: {
+  width: '100%',
+  height: 52,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: themas.colors.primary,
+  borderRadius: 12,
+  shadowColor: themas.colors.primary,
+  shadowOffset: { width: 0, height: 6 },
+  shadowOpacity: 0.4,
+  shadowRadius: 8,
+  elevation: 6,
 },
-shadowOpacity: 0.58,
-shadowRadius: 16.00,
-
-elevation: 24,
-  },
     textButton:{
 
     fontSize:16,
