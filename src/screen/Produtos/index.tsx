@@ -1,16 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
   View,
   FlatList,
   TouchableOpacity,
-  Pressable,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-
-import { MaterialIcons } from "@expo/vector-icons";
-import { useAuth } from "../../contexts/AuthContext";
+  SafeAreaView,
+  ActivityIndicator,
+  TextInput,
+  Alert,
+} from 'react-native';
+import api from '../../services/api';
+import { themas } from '../Login/themas';
 
 interface Produto {
   id: string;
@@ -19,11 +20,32 @@ interface Produto {
 }
 
 export default function Produtos({ navigation }: any) {
-  const [produtos, setProdutos] = useState<Produto[]>([
-    { id: "1", nome: "Camisa Brasil", preco: 299.9 },
-    { id: "2", nome: "Bola Oficial", preco: 199.9 },
-    { id: "3", nome: "Chuteira Profissional", preco: 459.9 },
-  ]);
+  const [produtos, setProdutos] = useState<Produto[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [pesquisa, setPesquisa] = useState<string>('');
+
+  
+  const carregarProdutos = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/produtos');
+      setProdutos(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar produtos da API:", error);
+      Alert.alert("Erro", "Não foi possível carregar a lista de produtos.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    carregarProdutos();
+  }, []);
+
+
+  const produtosFiltrados = produtos.filter(produto =>
+    produto.nome.toLowerCase().includes(pesquisa.toLowerCase())
+  );
 
   const { darkMode, toggleDarkMode } = useAuth();
 
@@ -72,15 +94,39 @@ export default function Produtos({ navigation }: any) {
         />
       </Pressable>
 
-      <FlatList
-        data={produtos}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={styles.list}
-        ListEmptyComponent={
-          <Text style={styles.empty}>Nenhum produto cadastrado.</Text>
-        }
-      />
+      
+      <View style={styles.searchSection}>
+        <View style={styles.BoxInput}>
+          <TextInput
+            style={styles.input}
+            placeholder="Buscar produto por nome..."
+            placeholderTextColor={themas.colors.gray || '#888'}
+            value={pesquisa}
+            onChangeText={(text) => setPesquisa(text)}
+          />
+        </View>
+      </View>
+
+     
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={themas.colors.primary || '#009C3B'} />
+          <Text style={{ marginTop: 10, color: '#555' }}>Buscando produtos...</Text>
+        </View>
+      ) : (
+       
+        <FlatList
+          data={produtosFiltrados}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderItem}
+          contentContainerStyle={styles.list}
+          ListEmptyComponent={
+            <Text style={styles.empty}>
+              {pesquisa ? "Nenhum produto corresponde à busca." : "Nenhum produto cadastrado."}
+            </Text>
+          }
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -90,18 +136,40 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f5f5f5",
   },
-
   title: {
     fontSize: 22,
-    fontWeight: "bold",
-    textAlign: "center",
-    margin: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginVertical: 15,
   },
-
+  searchSection: {
+    paddingHorizontal: 16,
+    marginBottom: 15,
+  },
+  BoxInput: {
+    width: '100%',
+    height: 45,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 40,
+    flexDirection: "row",
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    backgroundColor: '#fff',
+  },
+  input: {
+    flex: 1,
+    color: 'black',
+    paddingLeft: 5,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   list: {
     paddingHorizontal: 16,
   },
-
   card: {
     backgroundColor: "#fff",
     padding: 15,
@@ -111,32 +179,26 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-
   infoContainer: {
     flex: 1,
   },
-
   nome: {
     fontSize: 16,
     fontWeight: "bold",
   },
-
   preco: {
     marginTop: 5,
     color: "green",
   },
-
   button: {
     backgroundColor: "#009C3B",
     padding: 10,
     borderRadius: 8,
   },
-
   buttonText: {
     color: "#fff",
     fontWeight: "bold",
   },
-
   empty: {
     textAlign: "center",
     marginTop: 40,
