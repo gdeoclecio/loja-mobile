@@ -47,17 +47,21 @@ export default function Produtos({ navigation }: any) {
     produto.nome.toLowerCase().includes(pesquisa.toLowerCase())
   );
 
+  const { darkMode, toggleDarkMode } = useAuth();
+
   const renderItem = ({ item }: { item: Produto }) => (
-    <View style={styles.card}>
+    <View
+      style={[styles.card, { backgroundColor: darkMode ? "#2a2a2a" : "#fff" }]}
+    >
       <View style={styles.infoContainer}>
-        <Text style={styles.nome}>{item.nome}</Text>
+        <Text style={[styles.nome, { color: darkMode ? '#FFFFFF' : '#000000' }]}>{item.nome}</Text>
         <Text style={styles.preco}>R$ {item.preco.toFixed(2)}</Text>
       </View>
 
       <TouchableOpacity
         style={styles.button}
         onPress={() =>
-          navigation.navigate('EditarProduto', {
+          navigation.navigate("EditarProduto", {
             produto: item,
             setProdutos,
           })
@@ -69,8 +73,26 @@ export default function Produtos({ navigation }: any) {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Lista de Produtos</Text>
+    <SafeAreaView
+      style={[
+        styles.container,
+        { backgroundColor: darkMode ? "#1a1a1a" : "#f5f5f5" },
+      ]}
+    >
+      <Text style={[styles.title, { color: darkMode ? "#FFFFFF" : "#000000" }]}>
+        Lista de Produtos
+      </Text>
+
+      <Pressable
+        onPress={toggleDarkMode}
+        style={{ position: 'absolute', top: 20, right: 20 }}
+      >
+        <MaterialIcons
+          name={darkMode ? 'wb-sunny' : 'nightlight-round'}
+          size={28}
+          color={darkMode ? '#FFD700' : '#002776'}
+        />
+      </Pressable>
 
       
       <View style={styles.searchSection}>
@@ -112,7 +134,7 @@ export default function Produtos({ navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   title: {
     fontSize: 22,
@@ -149,37 +171,37 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 15,
     marginBottom: 10,
     borderRadius: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   infoContainer: {
     flex: 1,
   },
   nome: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   preco: {
     marginTop: 5,
-    color: 'green',
+    color: "green",
   },
   button: {
-    backgroundColor: '#009C3B',
+    backgroundColor: "#009C3B",
     padding: 10,
     borderRadius: 8,
   },
   buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
   },
   empty: {
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 40,
-    color: '#999',
+    color: "#999",
   },
 });
