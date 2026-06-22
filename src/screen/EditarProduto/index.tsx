@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import {View,Text,TextInput,TouchableOpacity,ScrollView,Alert,ActivityIndicator,} from "react-native";
+import {View,Text,TextInput,TouchableOpacity,ScrollView,Alert,ActivityIndicator,Pressable,} from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
+import { MaterialIcons } from "@expo/vector-icons";
 import api from "../../services/api";
 import styles from "./EditarProduto.styles";
+import { useAuth } from "../../contexts/AuthContext";
 
 const INITIAL_FORM = {
   title: "",
@@ -22,12 +24,11 @@ const FIELDS = [
 
 
 export default function EditarProduto() {
-  const {
-    params: { id },
-  } = useRoute();
+  const {params: { id },} = useRoute<any>();
 
   const navigation = useNavigation();
 
+  const { darkMode, toggleDarkMode } = useAuth();
   const [formData, setFormData] = useState(INITIAL_FORM);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -167,97 +168,208 @@ export default function EditarProduto() {
   }
 
   if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator
-          size="large"
-          color="#009c3b"
-        />
-        <Text style={styles.loadingText}>
-          Carregando produto...
-        </Text>
-      </View>
-    );
-  }
-
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.titulo}>
-          Editar Produto
-        </Text>
+    <View
+      style={[
+        styles.loadingContainer,
+        {
+          backgroundColor: darkMode
+            ? "#1a1a1a"
+            : "#f5f5f5",
+        },
+      ]}
+    >
+      <ActivityIndicator
+        size="large"
+        color="#009c3b"
+      />
 
-        {FIELDS.map(
-          ({ name, placeholder, ...rest }) => (
-            <TextInput
-              key={name}
-              style={styles.input}
-              placeholder={placeholder}
-              placeholderTextColor="#aaa"
-              value={formData[name]}
-              onChangeText={(value) =>
-                handleChange(name, value)
-              }
-              editable={!saving}
-              {...rest}
-            />
-          )
-        )}
+      <Text
+        style={[
+          styles.loadingText,
+          {
+            color: darkMode
+              ? "#fff"
+              : "#333",
+          },
+        ]}
+      >
+        Carregando produto...
+      </Text>
+    </View>
+  );
+}
 
-        <View style={styles.acoes}>
-          <TouchableOpacity
+return (
+  <ScrollView
+    contentContainerStyle={[
+      styles.container,
+      {
+        backgroundColor: darkMode
+          ? "#1a1a1a"
+          : "#f5f5f5",
+      },
+    ]}
+  >
+    <View
+      style={[
+        styles.card,
+        {
+          backgroundColor: darkMode
+            ? "#2b2b2b"
+            : "#fff",
+
+          borderColor: darkMode
+            ? "#444"
+            : "#e0e0e0",
+        },
+      ]}
+    >
+      <Pressable
+        onPress={toggleDarkMode}
+        style={{
+          position: "absolute",
+          top: 20,
+          right: 20,
+          zIndex: 1,
+        }}
+      >
+        <MaterialIcons
+          name={
+            darkMode
+              ? "wb-sunny"
+              : "nightlight-round"
+          }
+          size={28}
+          color={
+            darkMode
+              ? "#FFD700"
+              : "#002776"
+          }
+        />
+      </Pressable>
+
+      <Text
+        style={[
+          styles.titulo,
+          {
+            color: darkMode
+              ? "#fff"
+              : "#009c3b",
+          },
+        ]}
+      >
+        Editar Produto
+      </Text>
+
+      {FIELDS.map(
+        ({
+          name,
+          placeholder,
+          ...rest
+        }) => (
+          <TextInput
+            key={name}
             style={[
-              styles.botaoSalvar,
-              saving &&
-                styles.botaoDesabilitado,
-            ]}
-            onPress={handleSubmit}
-            disabled={saving}
-          >
-            {saving ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text
-                style={styles.botaoSalvarTexto}
-              >
-                Editar
-              </Text>
-            )}
-          </TouchableOpacity>
+              styles.input,
+              {
+                backgroundColor:
+                  darkMode
+                    ? "#1f1f1f"
+                    : "#fff",
 
-          <TouchableOpacity
-            style={[
-              styles.botaoCancelar,
-              saving &&
-                styles.botaoDesabilitado,
+                color: darkMode
+                  ? "#fff"
+                  : "#333",
+
+                borderColor:
+                  darkMode
+                    ? "#666"
+                    : "#009c3b",
+              },
             ]}
-            onPress={() =>
-              navigation.navigate("Produtos")
+            placeholder={placeholder}
+            placeholderTextColor={
+              darkMode
+                ? "#888"
+                : "#aaa"
             }
-            disabled={saving}
-          >
-            <Text
-              style={styles.botaoCancelarTexto}
-            >
-              Cancelar
-            </Text>
-          </TouchableOpacity>
-        </View>
+            value={formData[name]}
+            onChangeText={(value) =>
+              handleChange(
+                name,
+                value
+              )
+            }
+            editable={!saving}
+            {...rest}
+          />
+        )
+      )}
 
+      <View style={styles.acoes}>
         <TouchableOpacity
           style={[
-            styles.botaoExcluir,
+            styles.botaoSalvar,
             saving &&
               styles.botaoDesabilitado,
           ]}
-          onPress={handleDeleteConfirm}
+          onPress={handleSubmit}
           disabled={saving}
         >
-          <Text style={styles.botaoExcluirTexto}>
-            Excluir Produto
+          {saving ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text
+              style={
+                styles.botaoSalvarTexto
+              }
+            >
+              Editar
+            </Text>
+          )}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.botaoCancelar,
+            saving &&
+              styles.botaoDesabilitado,
+          ]}
+          onPress={() =>
+            navigation.navigate(
+              "Produtos"
+            )
+          }
+          disabled={saving}
+        >
+          <Text
+            style={
+              styles.botaoCancelarTexto
+            }
+          >
+            Cancelar
           </Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
-  );
-}
+
+      <TouchableOpacity
+        style={[
+          styles.botaoExcluir,
+          saving &&
+            styles.botaoDesabilitado,
+        ]}
+        onPress={handleDeleteConfirm}
+        disabled={saving}
+      >
+        <Text
+          style={
+            styles.botaoExcluirTexto
+          }
+        >
+          Excluir Produto
+        </Text>
+      </TouchableOpacity>
+    </View>
+  </ScrollView>
+);
