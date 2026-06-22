@@ -5,14 +5,12 @@ import { themas } from "./themas";
 export { themas };
 
 export const style = StyleSheet.create({
-
-  container: {
-    flex: 1,
-    backgroundColor: themas.colors.bgScreen,
-    alignItems: "center",
-    justifyContent: "flex-start",
-
-  },
+container: {
+  flex: 1,
+  backgroundColor: themas.colors.bgScreen,
+  alignItems: "center",
+  justifyContent: "space-between",
+},
   boxTop: {
     height: Dimensions.get('window').height * 0.35,
     width: "100%",
@@ -26,13 +24,12 @@ export const style = StyleSheet.create({
     paddingHorizontal: 37,
     paddingVertical: 20,
   },
-  boxBottom: {
-    height: Dimensions.get('window').height/3,
-    width: "100%",
-    //backgroundColor: "#D4B8E0",
-    alignItems:"center",
-    justifyContent:"center",
-  },
+boxBottom: {
+  width: "100%",
+  paddingHorizontal: 37,
+  marginTop: 20,
+  alignItems: "center",
+},
 
   text:{
     fontWeight:'bold',
