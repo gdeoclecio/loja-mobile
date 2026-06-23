@@ -1,10 +1,8 @@
-# Loja Mobile - Copa 2026
+# 📱 Loja Mobile - Copa 2026
 
 Aplicativo mobile desenvolvido em React Native durante a Residência TIC Serratec.
 
----
-
-## Integrantes
+## 👥 Integrantes
 
 * Gabriela Carvalho
 * Roberta Rocha
@@ -14,90 +12,201 @@ Aplicativo mobile desenvolvido em React Native durante a Residência TIC Serrate
 
 ---
 
-## Tecnologias Utilizadas
+## 🚀 Tecnologias Utilizadas
 
 * React Native
 * Expo
 * TypeScript
 * React Navigation
 * Axios
+* AsyncStorage
+* Context API
 * Git e GitHub
 
 ---
 
-## Funcionalidades Implementadas (Etapa 1)
+## 📋 Funcionalidades
 
-* Login local com validação de usuário e senha
-* Navegação entre telas
-* Tela Home (temporária)
-* Listagem de Produtos(vazia pois ainda não estamos consumindo nenhuma API.)
+### 🔐 Autenticação
 
----
+* Tela de login com validação de credenciais.
+* Persistência de sessão utilizando AsyncStorage.
+* Controle global de autenticação através de Context API.
 
-## Credenciais de Acesso
+### 📦 Produtos
 
-Para fins de demonstração nesta etapa do projeto, o login é realizado localmente, sem integração com API.
+* Listagem de produtos consumindo API REST.
+* Cadastro de novos produtos.
+* Edição de produtos existentes.
+* Exclusão de produtos.
+* Consumo de API utilizando Axios.
 
-Utilize as seguintes credenciais:
+### 🌙 Acessibilidade
 
-* Usuário: **admin@gmail.com**
-* Senha: **copa123**
+* Implementação de Dark Mode.
+* Alternância de tema utilizando Context API.
 
-Após autenticação, o usuário será direcionado para a tela Home.
+### 🧭 Navegação
 
----
-
-## Próximas Etapas
-
-* Integração com API REST
-* Autenticação via backend
-* CRUD completo de produtos
-* Melhorias visuais e UX
+* Navegação entre múltiplas telas utilizando React Navigation.
 
 ---
 
-## Como Executar o Projeto
+## 📱 Telas do Sistema
+
+* Login
+* Home
+* Produtos
+* Novo Produto
+* Editar Produto
+
+---
+
+## 🔗 Configuração da API
+
+O projeto utiliza uma API REST local.
+
+No arquivo `src/services/api.ts` configure o IP da máquina onde a API está sendo executada:
+
+
+import axios from "axios";
+
+const api = axios.create({
+  baseURL: "http://SEU-IP:8080",
+});
+
+export default api;
+
+
+### Atenção
+
+* O celular e o computador devem estar na mesma rede Wi-Fi.
+* Não utilize `localhost` ou `127.0.0.1`.
+* Utilize o endereço IPv4 da máquina que executa a API.
+
+Para descobrir o IP:
+
+
+ipconfig
+
+
+Procure por:
+
+
+IPv4 Address . . . . . . . . : 192.168.x.x
+
+## 👤 Criação de Usuário para Login
+
+Antes de realizar o login no aplicativo, é necessário cadastrar um usuário na API.
+
+### Endpoint
+
+
+POST /auth/register
+
+
+### Exemplo utilizando Postman
+
+URL:
+
+http://localhost:8080/auth/register
+
+
+Body (JSON):
+
+
+{
+  "username": "admin@gmail.com",
+  "password": "123456"
+}
+
+
+Após o cadastro ser realizado com sucesso, utilize as mesmas credenciais na tela de login do aplicativo:
+
+
+Usuário: admin@gmail.com
+Senha: 123456
+
+
+### Observação
+
+Caso a API esteja sendo executada em outra máquina ou dispositivo, substitua `localhost` pelo endereço IP correspondente.
+
+Exemplo:
+
+http://192.168.x.x:8080/auth/register
+
+
+
+## ⚙️ Como Executar o Projeto
 
 ### 1. Clonar o repositório
 
-git clone [URL_DO_REPOSITORIO]
+
+git clone URL_DO_REPOSITORIO
+
 
 ### 2. Entrar na pasta do projeto
 
+
 cd loja-mobile
+
 
 ### 3. Instalar dependências
 
+
 npm install
 
-### 4. Iniciar o projeto
+
+### 4. Executar o projeto
+
 
 npx expo start
 
+
 ### 5. Executar no celular
 
-* Instalar o aplicativo Expo Go
-* Escanear o QR Code exibido no terminal
+* Instalar o Expo Go
+* Escanear o QR Code exibido pelo Expo
 
----
+-
 
-## Estrutura do Projeto
+## 📂 Estrutura do Projeto
 
-src/
-├── contexts/
-├── routes/
-├── screen/
+
+src
+├── assets
+├── contexts
+│   └── AuthContext
+├── routes
+├── screen
 │   ├── Login
 │   ├── Home
 │   ├── Produtos
 │   ├── NovoProduto
 │   └── EditarProduto
-├── services/
-└── assets/
+├── services
+│   └── api.ts
+└── App.tsx
+```
 
 ---
 
-## Observações
+## 🎯 Requisitos Atendidos
 
-Este projeto representa a Etapa 1 do desenvolvimento mobile.
-A integração com API e autenticação real serão implementadas na próxima fase do sistema.
+* ✔ React Navigation
+* ✔ Context API
+* ✔ AsyncStorage
+* ✔ Axios
+* ✔ CRUD Completo (GET, POST, PUT e DELETE)
+* ✔ Autenticação
+* ✔ Dark Mode
+* ✔ Validação de Formulários
+* ✔ Versionamento com Git e GitHub
+* ✔ Build Android (APK)
+
+---
+
+## 📚 Projeto Acadêmico
+
+Desenvolvido como atividade da disciplina de React Native da Residência TIC Serratec.
