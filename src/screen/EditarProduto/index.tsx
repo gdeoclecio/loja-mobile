@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, ActivityInd
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
 import api from "../../services/api";
-import { styles } from "./EditarProduto.styles";
+import { styles } from "./EditarProduto.styles"
 import { useAuth } from "../../contexts/AuthContext";
 
 const INITIAL_FORM = {
