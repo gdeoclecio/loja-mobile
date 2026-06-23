@@ -64,7 +64,7 @@ export default function Login({ navigation }: any) {
   setLoading(true);
 
   try {
-    console.log("ANTES DO REQUEST");
+    
 
     const response = await api.post('/auth/login', {
       username,
@@ -80,7 +80,7 @@ export default function Login({ navigation }: any) {
   } catch (error: any) {
     console.log("ERRO LOGIN:", error);
   } finally {
-    console.log("FINAL DO LOGIN");
+    
     setLoading(false);
   }
 }

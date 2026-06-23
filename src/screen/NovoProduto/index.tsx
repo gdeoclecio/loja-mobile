@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { StyleSheet } from 'react-native';
-
 import {
   View,
   Text,
@@ -9,18 +7,21 @@ import {
   ActivityIndicator,
   Alert,
   ScrollView,
+  StyleSheet,
+  Pressable,
 } from 'react-native';
-
+import { MaterialIcons } from '@expo/vector-icons';
+import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 
 export default function NovoProduto({ navigation }: any) {
+  const { darkMode, toggleDarkMode } = useAuth();
 
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState('');
   const [image, setImage] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
-
   const [loading, setLoading] = useState(false);
 
   async function salvarProduto() {
@@ -42,7 +43,6 @@ export default function NovoProduto({ navigation }: any) {
 
       Alert.alert('Sucesso', 'Produto cadastrado!');
       navigation.goBack();
-
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível cadastrar produto');
     } finally {
@@ -50,50 +50,80 @@ export default function NovoProduto({ navigation }: any) {
     }
   }
 
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
+  const inputStyle = [
+    styles.input,
+    {
+      backgroundColor: darkMode ? '#1f1f1f' : '#fff',
+      borderColor: darkMode ? '#666' : '#ddd',
+      color: darkMode ? '#fff' : '#333',
+    },
+  ];
 
-      <Text style={styles.title}>Novo Produto</Text>
+  return (
+    <ScrollView
+      contentContainerStyle={[
+        styles.container,
+        { backgroundColor: darkMode ? '#121212' : '#f0f4f0' },
+      ]}
+    >
+      <Pressable onPress={toggleDarkMode} style={styles.darkModeButton}>
+        <MaterialIcons
+          name={darkMode ? 'wb-sunny' : 'nightlight-round'}
+          size={26}
+          color={darkMode ? '#FFD700' : '#002776'}
+        />
+      </Pressable>
+
+      <Text style={[styles.title, { color: darkMode ? '#fff' : '#002776' }]}>
+        Novo Produto
+      </Text>
 
       <TextInput
-        style={styles.input}
+        style={inputStyle}
         placeholder="Título do produto"
+        placeholderTextColor={darkMode ? '#888' : '#aaa'}
         value={title}
         onChangeText={setTitle}
       />
 
       <TextInput
-        style={styles.input}
+        style={inputStyle}
         placeholder="Preço"
+        placeholderTextColor={darkMode ? '#888' : '#aaa'}
         keyboardType="numeric"
         value={price}
         onChangeText={setPrice}
       />
 
       <TextInput
-        style={styles.input}
+        style={inputStyle}
         placeholder="URL da imagem"
+        placeholderTextColor={darkMode ? '#888' : '#aaa'}
+        autoCapitalize="none"
         value={image}
         onChangeText={setImage}
       />
 
       <TextInput
-        style={styles.input}
+        style={inputStyle}
         placeholder="Descrição"
+        placeholderTextColor={darkMode ? '#888' : '#aaa'}
         value={description}
         onChangeText={setDescription}
       />
 
       <TextInput
-        style={styles.input}
+        style={inputStyle}
         placeholder="Categoria"
+        placeholderTextColor={darkMode ? '#888' : '#aaa'}
         value={category}
         onChangeText={setCategory}
       />
 
       <TouchableOpacity
-        style={styles.button}
+        style={[styles.button, loading && styles.buttonDisabled]}
         onPress={salvarProduto}
+        disabled={loading}
       >
         {loading ? (
           <ActivityIndicator color="#fff" />
@@ -102,33 +132,41 @@ export default function NovoProduto({ navigation }: any) {
         )}
       </TouchableOpacity>
 
+      <TouchableOpacity
+        style={styles.cancelButton}
+        onPress={() => navigation.goBack()}
+      >
+        <Text style={[styles.cancelText, { color: darkMode ? '#aaa' : '#555' }]}>
+          Cancelar
+        </Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
-export const styles = StyleSheet.create({
+
+const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    padding: 20,
-    backgroundColor: '#F5F5F5',
+    padding: 24,
     justifyContent: 'center',
   },
-
+  darkModeButton: {
+    alignSelf: 'flex-end',
+    marginBottom: 10,
+  },
   title: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 24,
     textAlign: 'center',
   },
-
   input: {
-    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#ddd',
     padding: 12,
     borderRadius: 10,
     marginBottom: 12,
+    fontSize: 15,
   },
-
   button: {
     backgroundColor: '#009C3B',
     padding: 14,
@@ -136,9 +174,19 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
   },
-
+  buttonDisabled: {
+    opacity: 0.6,
+  },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: 16,
+  },
+  cancelButton: {
+    alignItems: 'center',
+    marginTop: 14,
+  },
+  cancelText: {
+    fontSize: 14,
   },
 });
