@@ -61,21 +61,61 @@ Aplicativo mobile desenvolvido em React Native durante a Residência TIC Serrate
 * Editar Produto
 
 ---
+## API Utilizada
 
-## 🔗 Configuração da API
+Este aplicativo consome a API REST do projeto Loja Copa 2026, responsável pela autenticação de usuários e gerenciamento dos produtos.
 
-O projeto utiliza uma API REST local.
+Repositório da API:
 
-No arquivo `src/services/api.ts` configure o IP da máquina onde a API está sendo executada:
+https://github.com/gdeoclecio/api-loja
+
+### Configuração da API
+
+Antes de executar o aplicativo mobile, é necessário iniciar a API localmente.
+comando para rodar api:  mvn spring-boot:run
+
+A API deve estar em execução na porta:
 
 
-import axios from "axios";
+http://localhost:8080
 
-const api = axios.create({
-  baseURL: "http://SEU-IP:8080",
-});
 
-export default api;
+ou no endereço IP da máquina que estiver hospedando a API, conforme configurado no arquivo `src/services/api.ts` do aplicativo.
+
+### Cadastro de Usuário
+
+Antes do primeiro acesso, é necessário cadastrar um usuário utilizando o endpoint de registro.
+
+**Método:**
+
+
+POST /auth/register
+
+
+**URL completa:**
+
+
+http://localhost:8080/auth/register
+
+
+**Body (JSON):**
+
+
+{
+  "username": "admin@gmail.com",
+  "password": "123456"
+}
+
+Após o cadastro, utilize as mesmas credenciais na tela de login do aplicativo.
+
+### Fluxo de Execução
+
+1. Clonar e executar a API.
+2. Realizar o cadastro do usuário pelo endpoint `/auth/register`.
+3. Confirmar que a API está em execução na porta `8080`.
+4. Executar o aplicativo React Native.
+5. Realizar login utilizando as credenciais cadastradas.
+6. Utilizar normalmente as funcionalidades de listagem, cadastro, edição e exclusão de produtos.
 
 
 ### Atenção
@@ -95,38 +135,6 @@ Procure por:
 
 IPv4 Address . . . . . . . . : 192.168.x.x
 
-## 👤 Criação de Usuário para Login
-
-Antes de realizar o login no aplicativo, é necessário cadastrar um usuário na API.
-
-### Endpoint
-
-
-POST /auth/register
-
-
-### Exemplo utilizando Postman
-
-URL:
-
-http://localhost:8080/auth/register
-
-
-Body (JSON):
-
-
-{
-  "username": "admin@gmail.com",
-  "password": "123456"
-}
-
-
-Após o cadastro ser realizado com sucesso, utilize as mesmas credenciais na tela de login do aplicativo:
-
-
-Usuário: admin@gmail.com
-Senha: 123456
-
 
 ### Observação
 
@@ -141,9 +149,6 @@ http://192.168.x.x:8080/auth/register
 ## ⚙️ Como Executar o Projeto
 
 ### 1. Clonar o repositório
-
-
-git clone URL_DO_REPOSITORIO
 
 
 ### 2. Entrar na pasta do projeto
