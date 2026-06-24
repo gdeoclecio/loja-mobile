@@ -7,18 +7,21 @@ import {
   Image,
   Animated,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  Alert
 } from 'react-native';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { style, themas } from './style';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import api from '../../services/api';
 
 export default function Login({ navigation }: any) {
 
-  const { login, darkMode, toggleDarkMode } = useAuth();
+  const { login } = useAuth();
+  const { darkMode, toggleDarkMode } = useTheme();
 
   const opacidade = useRef(new Animated.Value(0)).current;
   const escala = useRef(new Animated.Value(0.3)).current;
@@ -78,6 +81,7 @@ export default function Login({ navigation }: any) {
    
 
   } catch (error: any) {
+    Alert.alert("Erro", JSON.stringify(error.message));
     console.log("ERRO LOGIN:", error);
   } finally {
     
