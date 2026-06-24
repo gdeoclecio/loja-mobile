@@ -10,8 +10,11 @@ import {
   TextInput,
   Alert,
   Image,
+  Pressable,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { MaterialIcons } from '@expo/vector-icons';
+import { useTheme } from '../../contexts/ThemeContext';
 import api from '../../services/api';
 
 interface Produto {
@@ -23,6 +26,7 @@ interface Produto {
 
 export default function Produtos() {
   const navigation = useNavigation<any>();
+  const { darkMode, toggleDarkMode } = useTheme();
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [loading, setLoading] = useState(true);
   const [pesquisa, setPesquisa] = useState('');
@@ -56,11 +60,13 @@ export default function Produtos() {
   );
 
   const renderItem = ({ item }: { item: Produto }) => (
-    <View style={styles.card}>
+    <View style={[styles.card, { backgroundColor: darkMode ? '#2b2b2b' : '#fff' }]}>
       <Image source={{ uri: item.image }} style={styles.image} />
 
       <View style={styles.info}>
-        <Text style={styles.title}>{item.title}</Text>
+        <Text style={[styles.title, { color: darkMode ? '#fff' : '#000' }]}>
+          {item.title}
+        </Text>
         <Text style={styles.price}>
           R$ {Number(item.price).toFixed(2)}
         </Text>
@@ -85,12 +91,29 @@ export default function Produtos() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>Produtos</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: darkMode ? '#121212' : '#f5f5f5' }]}>
+
+      <View style={styles.headerRow}>
+        <Text style={[styles.header, { color: darkMode ? '#fff' : '#000' }]}>
+          Produtos
+        </Text>
+        <Pressable onPress={toggleDarkMode}>
+          <MaterialIcons
+            name={darkMode ? 'wb-sunny' : 'nightlight-round'}
+            size={26}
+            color={darkMode ? '#FFD700' : '#002776'}
+          />
+        </Pressable>
+      </View>
 
       <TextInput
-        style={styles.search}
+        style={[styles.search, {
+          backgroundColor: darkMode ? '#1f1f1f' : '#fff',
+          borderColor: darkMode ? '#666' : '#ccc',
+          color: darkMode ? '#fff' : '#000',
+        }]}
         placeholder="Buscar produto..."
+        placeholderTextColor={darkMode ? '#888' : '#aaa'}
         value={pesquisa}
         onChangeText={setPesquisa}
       />
@@ -112,16 +135,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f5f5f5',
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
   },
   header: {
     fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 10,
   },
   search: {
     borderWidth: 1,
-    borderColor: '#ccc',
     padding: 10,
     borderRadius: 8,
     marginBottom: 10,
@@ -129,7 +155,6 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
     padding: 10,
     marginBottom: 10,
     borderRadius: 10,

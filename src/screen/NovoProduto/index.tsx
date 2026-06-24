@@ -12,10 +12,11 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import api from '../../services/api';
 
 export default function NovoProduto({ navigation }: any) {
-  const { darkMode, toggleDarkMode } = useAuth();
+  const { darkMode, toggleDarkMode } = useTheme();
 
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState('');

@@ -10,9 +10,11 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useAuth } from "../../contexts/AuthContext";
+import { useTheme } from "../../contexts/ThemeContext";
 
 export default function Home({ navigation }: any) {
-  const { logout, darkMode, toggleDarkMode } = useAuth();
+  const { logout } = useAuth();
+  const { darkMode, toggleDarkMode } = useTheme();
 
   return (
     <View style={[styles.container, { backgroundColor: darkMode ? "#121212" : "#f0f4f0" }]}>
